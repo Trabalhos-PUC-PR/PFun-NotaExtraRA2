@@ -6,7 +6,7 @@ hidden = [".ghci", "ghci_wrapper.sh"]
 channel = "stable-22_11"
 
 [interpreter]
-command = ["./ghci_wrapper.sh"]
+command = ["cd src && ./../ghci_wrapper.sh"]
 
 [languages.haskell]
 pattern = "**/*.hs"
