@@ -1,3 +1,7 @@
+-- ./ghci_wrapper.sh
+-- > :setup
+-- > :rerun
+
 module Main where
 import Ex1
 import Ex2

@@ -14,3 +14,7 @@ validaCartao lista
   | length lista < 2 = False
   | mod (2 * sum (pegaDoisEmDois lista)) 10 == 0 = True
   | otherwise = False
+
+main :: IO ()
+main = do  
+  print (validaCartao [1,2,3,4, 5,6,7,8, 9,0,1,2, 3,4,5,6])
