@@ -1,5 +1,6 @@
 module Ex1 where
-import Data.String
+import Text.Read
+import Data.Maybe (isJust)
 -- Exercício 1:  CALCULADORA
 
 -- Você deverá implementar, em Haskell, uma calculadora capaz de realizar, em números reais, as quatro operações, as operações trigonométricas (seno, cosseno e tangente) e as operações de exponenciação (quadrado, cubo, raiz quadrada, raiz cúbica e x elevado a y). Usando notação rpn de tal forma que todas as operações sejam representadas por uma S-expression. Como mostrado no exemplo
@@ -14,36 +15,7 @@ import Data.String
 
 data ExpressArg = Expression String | Value Float deriving (Show)
 
-smm :: Float -> Float -> Float
-smm = (+)
-sub :: Float -> Float -> Float
-sub = (-)
-tim :: Float -> Float -> Float
-tim = (*)
-dis :: Float -> Float -> Float
-dis = (/)
-exn :: (Floating a) => a -> a -> a
-exn v1 v2 = v1 ** v2
-sqr :: (Floating a) => a -> a 
-sqr = (**2)
-cbc :: (Floating a) => a -> a 
-cbc = (**3)
-sqR :: (Floating a) => a -> a 
-sqR = (**(1/2))
-cbR :: (Floating a) => a -> a 
-cbR = (**(1/3))
-
-isOpenParenth :: ExpressArg -> Bool
-isOpenParenth (Expression s)
-  | s == "(" = True
-  | otherwise = False
-isOpenParenth (Value v) = False 
-isClosedParenth :: ExpressArg -> Bool
-isClosedParenth (Expression s)
-  | s == ")" = True
-  | otherwise = False
-isClosedParenth (Value v) = False 
-
+-- Getters e "Checkers"
 isExpress :: ExpressArg -> Bool
 isExpress (Expression s) = True
 isExpress (Value v) = False 
@@ -55,68 +27,63 @@ getExp :: ExpressArg -> String
 getExp (Expression s) = s
 getExp (Value v) = ""
 getVal :: ExpressArg -> Float
-getVal (Expression s) = 0.0
+getVal (Expression s) = -0
 getVal (Value v) = v 
-  
-isNumeric :: String -> Bool
-isNumeric str = case reads str :: [(Double, String)] of
-               [(_, "")] -> True
-               _ -> False
-isNotNumeric :: String -> Bool
-isNotNumeric str = case reads str :: [(Double, String)] of
-               [(_, "")] -> False
-               _ -> True
 
-first :: [a] -> a
-first = head
+-- Verifica se a String é valida para ser um numero ou nao
+isNumeric :: String -> Bool
+isNumeric str = isJust(readMaybe str :: Maybe Float)
+
+-- Pega o penultimo elemento de uma lista
 last2 :: [a] -> a
 last2 s = head (tail (reverse s))
 
+-- Interpreta uma dada expressão e retorna seu resultado
 interpret :: String -> Float
 interpret s = calculator(parseString (words s)) []
 
+-- Em palavras simples, converte valores numericos em um tipo e strings em outro, e devolve tudo como uma lista
 parseString :: [String] -> [ExpressArg]
 parseString s
-  | length s > 1 && isNumeric (first s) = Value (read (head s)) : parseString (tail s)
-  | length s > 1 && isNotNumeric (first s) = Expression (head s) : parseString (tail s)
-  | length s == 1 && isNumeric (first s) = [Value (read(head s))]
+  | length s > 1 && isNumeric (head s) = Value (read (head s)) : parseString (tail s)
+  | length s > 1 && not(isNumeric (head s)) = Expression (head s) : parseString (tail s)
+  | length s == 1 && isNumeric (head s) = [Value (read(head s))]
   | otherwise = [Expression (head s)]
 
+-- Calcula dada expressão representada pelo tipo criado e devolve um float
 calculator :: [ExpressArg] -> [Float] -> Float
 calculator lista acc
   | null lista = sum acc
-  | isOpenParenth (first lista) || isClosedParenth (first lista) = calculator(tail lista) acc
-  | isValue (first lista) = calculator(tail lista) ( acc++[getVal(first lista)] )
-  | isExpress (first lista) = calculator(tail lista) ( applier (getExp(first lista)) acc)
+  | getExp(head lista)=="(" || getExp(head lista)==")" = calculator(tail lista) acc
+  | isValue (head lista) = calculator(tail lista) ( acc++[getVal(head lista)] )
+  | isExpress (head lista) = calculator(tail lista) ( applier (getExp(head lista)) acc)
   | otherwise = sum acc
 
+-- Aplica funcoes de acordo com o valor da string passada
 applier :: String -> [Float] -> [Float]
 applier s v1
-  | s == "sin" = init v1 ++ [sin (last v1)]
-  | s == "cos" = init v1 ++ [cos (last v1)]
-  | s == "tan" = init v1 ++ [tan (last v1)]
-  | s == "sqr" = init v1 ++ [sqr (last v1)]
-  | s == "cbc" = init v1 ++ [cbc (last v1)]
-  | s == "sqR" = init v1 ++ [sqR (last v1)]
-  | s == "cbR" = init v1 ++ [cbR (last v1)]
-  | s == "smm" = init (init v1) ++ [smm (last2 v1) (last v1)]
-  | s == "sub" = init (init v1) ++ [sub (last2 v1) (last v1)]
-  | s == "tim" = init (init v1) ++ [tim (last2 v1) (last v1)]
-  | s == "dis" = init (init v1) ++ [dis (last2 v1) (last v1)]
-  | s == "exn" = init (init v1) ++ [exn (last2 v1) (last v1)]
-  | otherwise = [123.321] --invalid expression, always returns this strange number
+  | s == "sin" = init v1 ++ [sin (last v1)]                 -- seno
+  | s == "cos" = init v1 ++ [cos (last v1)]                 -- cosseno
+  | s == "tan" = init v1 ++ [tan (last v1)]                 -- tangente
+  | s == "sqr" = init v1 ++ [last v1 ** 2]                  -- ao quadrado
+  | s == "cbc" = init v1 ++ [last v1 ** 3]                  -- ao cubo
+  | s == "sqrt" = init v1 ++ [last v1**(1/2)]                 -- raiz quadrada
+  | s == "cbct" = init v1 ++ [last v1**(1/3)]                 -- raiz cubica
+  | s == "+" = init (init v1) ++ [(+) (last2 v1) (last v1)] -- soma
+  | s == "-" = init (init v1) ++ [(-) (last2 v1) (last v1)] -- subtracao
+  | s == "*" = init (init v1) ++ [(*) (last2 v1) (last v1)] -- multiplicacao
+  | s == "/" = init (init v1) ++ [(/) (last2 v1) (last v1)] -- divisao
+  | s == "exp" = init (init v1) ++ [last2 v1 ** last v1]    -- elevado ao (potencia)
+  | otherwise = [0] --invalid expression, always returns 
 
-main :: IO ()
-main = do
-  let exp1 = "3 6 sub"
-  let exp2 = "( 5 ( 3 1 sub ) smm )"
-  let exp3 = "( ( 5 3 smm ) cbc )"
-  let exp4 = "( 3.4 ( 3.0 2 exn ) smm )"
-  let exp5 = "( 2 6 exn ) ( 3 9 tim ) dis"
-  let exp6 = "( 69 2 exn ) ( 24 ( 3.14 -0.911 tim ) smm ) dis"
-  print (interpret exp1)
-  print (interpret exp2)
-  print (interpret exp3)
-  print (interpret exp4)
-  print (interpret exp5)
-  print (interpret exp6)
+-- main :: IO ()
+-- main = do
+--   print (interpret "( 3 6 - )")
+--   print (interpret "( 5 ( 3 1 - ) + )")
+--   print (interpret "( ( 5 3 + ) cbc )")
+--   print (interpret "( 3.4 ( 3.0 2 exp ) + )")
+--   print (interpret "( 2 6 exp ) ( 3 9 * ) /")
+--   print (interpret "( 69 2 exp ) ( 24 ( 3.14 -0.911 * ) + ) /")
+--   print (interpret "( 3.1415926 2 / ) sin")
+--   print (interpret " 4 sqrt")
+--   print (interpret " 27 cbct")

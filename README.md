@@ -8,8 +8,8 @@
 
 Macros para rodar os diferentes programas:
 ```shell
-:setup --Compila o arquivo Main.hs e carrega ele, sempre rodar o setup primeiro
+:setup --Compila o arquivo Main.hs, carrega e roda ele, !sempre rodar o setup primeiro!
 :load1 --Compila o arquivo Ex1.hs e carrega ele
 :load2 --Compila o arquivo Ex2.hs e carrega ele
-:rerun --Roda o projeto carregado atualmente
+:rerun --Roda o projeto carregado atualmente, chamando a funcao main
 ```
