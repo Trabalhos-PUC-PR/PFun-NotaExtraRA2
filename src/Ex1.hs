@@ -91,8 +91,7 @@ parseFloats s
 calculator :: [ExpressArg] -> [Float] -> Float
 calculator lista acc
   | null lista = sum acc
-  | isOpenParenth (first lista) = calculator(tail lista) acc
-  | isClosedParenth (first lista) = sum acc 
+  | isOpenParenth (first lista) || isClosedParenth (first lista) = calculator(tail lista) acc
   | isValue (first lista) = calculator(tail lista) ( acc++[getVal(first lista)] )
   | isExpress (first lista) = calculator(tail lista) ( applier (getExp(first lista)) acc)
   | otherwise = sum acc
