@@ -25,6 +25,8 @@ main = do
   -- "/"  -   divisao
   -- "exp" -  x elevado a y
   print "Calculadora do Ex1" 
+  print (interpret "")
+  print (interpret "123.321")
   print (interpret "( 3 6 - )")
   print (interpret "( 5 ( 3 1 - ) + )")
   print (interpret "( ( 5 3 + ) sqr )")

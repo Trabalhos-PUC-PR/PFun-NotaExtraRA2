@@ -40,6 +40,7 @@ last2 s = head (tail (reverse s))
 
 -- | Interpreta uma dada expressão e retorna seu resultado como Float
 interpret :: String -> Float
+interpret "" = 0
 interpret s = calculator(parseString (words s)) []
 
 -- | Recebe uma lista de strings, e da parse nela de jeito que os valores numericos 
@@ -54,11 +55,11 @@ parseString s
 -- | Calcula dada expressão representada pelo tipo criado e devolve um float
 calculator :: [ExpressArg] -> [Float] -> Float
 calculator lista acc
-  | null lista = sum acc
+  | null lista = last acc
   | getExp(head lista)=="(" || getExp(head lista)==")" = calculator(tail lista) acc
   | isValue (head lista) = calculator(tail lista) ( acc++[getVal(head lista)] )
   | isExpress (head lista) = calculator(tail lista) ( applier (getExp(head lista)) acc)
-  | otherwise = sum acc
+  | otherwise = error "interpretError - an argument inside the expression is invalid"
 
 -- | Aplica funcoes de acordo com o valor da expressão recebida, 
 -- levanta erro caso a expressão seja invalida
