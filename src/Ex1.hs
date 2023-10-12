@@ -12,14 +12,16 @@ import Data.String
 
 -- É importante observar que as S-expressions podem ser aninhadas, como pode ser visto no exemplo b e que não há limites para o aninhamento de expressões. Além disso, é importante lembrar que algumas operações solicitadas são unárias e outras são binárias.
 
+data ExpressArg = Expression String | Value Float deriving (Show)
+
 smm :: Float -> Float -> Float
-smm v1 v2 = v1 + v2
+smm = (+)
 sub :: Float -> Float -> Float
-sub v1 v2 = v1 - v2
+sub = (-)
 tim :: Float -> Float -> Float
-tim v1 v2 = v1 - v2
+tim = (*)
 dis :: Float -> Float -> Float
-dis v1 v2 = v1 - v2
+dis = (/)
 exn :: (Floating a) => a -> a -> a
 exn v1 v2 = v1 ** v2
 sqr :: (Floating a) => a -> a 
@@ -30,8 +32,6 @@ sqR :: (Floating a) => a -> a
 sqR = (**(1/2))
 cbR :: (Floating a) => a -> a 
 cbR = (**(1/3))
-
-data ExpressArg = Expression String | Value Float deriving (Show)
 
 isOpenParenth :: ExpressArg -> Bool
 isOpenParenth (Expression s)
@@ -69,22 +69,16 @@ isNotNumeric str = case reads str :: [(Double, String)] of
 
 first :: [a] -> a
 first = head
-second :: [a] -> a
-second s = head (tail s)
-third :: [a] -> a
-third s = head (tail (tail s))
 last2 :: [a] -> a
 last2 s = head (tail (reverse s))
-last3 :: [a] -> a
-last3 s = head (tail (tail (reverse s)))
 
 interpret :: String -> Float
-interpret s = calculator(parseFloats (words s)) []
+interpret s = calculator(parseString (words s)) []
 
-parseFloats :: [String] -> [ExpressArg]
-parseFloats s
-  | length s > 1 && isNumeric (first s) = Value (read (head s)) : parseFloats (tail s)
-  | length s > 1 && isNotNumeric (first s) = Expression (head s) : parseFloats (tail s)
+parseString :: [String] -> [ExpressArg]
+parseString s
+  | length s > 1 && isNumeric (first s) = Value (read (head s)) : parseString (tail s)
+  | length s > 1 && isNotNumeric (first s) = Expression (head s) : parseString (tail s)
   | length s == 1 && isNumeric (first s) = [Value (read(head s))]
   | otherwise = [Expression (head s)]
 
@@ -118,7 +112,11 @@ main = do
   let exp2 = "( 5 ( 3 1 sub ) smm )"
   let exp3 = "( ( 5 3 smm ) cbc )"
   let exp4 = "( 3.4 ( 3.0 2 exn ) smm )"
+  let exp5 = "( 2 6 exn ) ( 3 9 tim ) dis"
+  let exp6 = "( 69 2 exn ) ( 24 ( 3.14 -0.911 tim ) smm ) dis"
   print (interpret exp1)
   print (interpret exp2)
   print (interpret exp3)
   print (interpret exp4)
+  print (interpret exp5)
+  print (interpret exp6)
