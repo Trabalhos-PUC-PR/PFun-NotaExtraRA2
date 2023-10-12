@@ -30,19 +30,20 @@ getVal :: ExpressArg -> Float
 getVal (Expression s) = -0
 getVal (Value v) = v 
 
--- Verifica se a String é valida para ser um numero ou nao
+-- | Verifica se a String é valida para ser um numero ou nao
 isNumeric :: String -> Bool
 isNumeric str = isJust(readMaybe str :: Maybe Float)
 
--- Pega o penultimo elemento de uma lista
+-- | Pega o penultimo elemento de uma lista
 last2 :: [a] -> a
 last2 s = head (tail (reverse s))
 
--- Interpreta uma dada expressão e retorna seu resultado
+-- | Interpreta uma dada expressão e retorna seu resultado como Float
 interpret :: String -> Float
 interpret s = calculator(parseString (words s)) []
 
--- Em palavras simples, converte valores numericos em um tipo e strings em outro, e devolve tudo como uma lista
+-- | Recebe uma lista de strings, e da parse nela de jeito que os valores numericos 
+-- são um tipo, e expressões são outro, e uma lista com todos os valores "parseados"
 parseString :: [String] -> [ExpressArg]
 parseString s
   | length s > 1 && isNumeric (head s) = Value (read (head s)) : parseString (tail s)
@@ -50,7 +51,7 @@ parseString s
   | length s == 1 && isNumeric (head s) = [Value (read(head s))]
   | otherwise = [Expression (head s)]
 
--- Calcula dada expressão representada pelo tipo criado e devolve um float
+-- | Calcula dada expressão representada pelo tipo criado e devolve um float
 calculator :: [ExpressArg] -> [Float] -> Float
 calculator lista acc
   | null lista = sum acc
@@ -59,22 +60,23 @@ calculator lista acc
   | isExpress (head lista) = calculator(tail lista) ( applier (getExp(head lista)) acc)
   | otherwise = sum acc
 
--- Aplica funcoes de acordo com o valor da string passada
+-- | Aplica funcoes de acordo com o valor da expressão recebida, 
+-- levanta erro caso a expressão seja invalida
 applier :: String -> [Float] -> [Float]
-applier s v1
-  | s == "sin" = init v1 ++ [sin (last v1)]                 -- seno
-  | s == "cos" = init v1 ++ [cos (last v1)]                 -- cosseno
-  | s == "tan" = init v1 ++ [tan (last v1)]                 -- tangente
-  | s == "sqr" = init v1 ++ [last v1 ** 2]                  -- ao quadrado
-  | s == "cbc" = init v1 ++ [last v1 ** 3]                  -- ao cubo
-  | s == "sqrt" = init v1 ++ [last v1**(1/2)]                 -- raiz quadrada
-  | s == "cbct" = init v1 ++ [last v1**(1/3)]                 -- raiz cubica
-  | s == "+" = init (init v1) ++ [(+) (last2 v1) (last v1)] -- soma
-  | s == "-" = init (init v1) ++ [(-) (last2 v1) (last v1)] -- subtracao
-  | s == "*" = init (init v1) ++ [(*) (last2 v1) (last v1)] -- multiplicacao
-  | s == "/" = init (init v1) ++ [(/) (last2 v1) (last v1)] -- divisao
-  | s == "exp" = init (init v1) ++ [last2 v1 ** last v1]    -- elevado ao (potencia)
-  | otherwise = [0] --invalid expression, always returns 
+applier exp acc
+  | exp == "sin" = init acc ++ [sin (last acc)]                  -- seno
+  | exp == "cos" = init acc ++ [cos (last acc)]                  -- cosseno
+  | exp == "tan" = init acc ++ [tan (last acc)]                  -- tangente
+  | exp == "sqr" = init acc ++ [last acc ** 2]                   -- ao quadrado
+  | exp == "cbc" = init acc ++ [last acc ** 3]                   -- ao cubo
+  | exp == "sqrt" = init acc ++ [last acc**(1/2)]                -- raiz quadrada
+  | exp == "cbct" = init acc ++ [last acc**(1/3)]                -- raiz cubica
+  | exp == "+" = init (init acc) ++ [(+) (last2 acc) (last acc)] -- soma
+  | exp == "-" = init (init acc) ++ [(-) (last2 acc) (last acc)] -- subtracao
+  | exp == "*" = init (init acc) ++ [(*) (last2 acc) (last acc)] -- multiplicacao
+  | exp == "/" = init (init acc) ++ [(/) (last2 acc) (last acc)] -- divisao
+  | exp == "exp" = init (init acc) ++ [last2 acc ** last acc]    -- elevado ao (potencia)
+  | otherwise = error ("interpretError - Invalid Expression ["++exp++"]") -- expressão invalida
 
 -- main :: IO ()
 -- main = do
