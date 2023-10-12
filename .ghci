@@ -1,6 +1,6 @@
 :set prompt "\ESC[33m\x02\x01\ESC[00m "
 :set prompt-cont "|\ESC[33m\x02\x01\ESC[00m "
-:def setup const $ return $ unlines [":cd src", ":load Main.hs"]
+:def rerun const $ return $ unlines [":reload",":! clear",":main"]
+:def setup const $ return $ unlines [":cd src", ":load Main.hs", ":rerun"]
 :def load1 const $ return $ unlines [":load Ex1.hs"]
 :def load2 const $ return $ unlines [":load Ex2.hs"]
-:def rerun const $ return $ unlines [":reload",":! clear",":main"]
