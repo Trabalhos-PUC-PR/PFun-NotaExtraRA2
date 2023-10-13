@@ -5,22 +5,20 @@ import Data.Maybe (isJust)
 
 -- Você deverá implementar, em Haskell, uma calculadora capaz de realizar, em números reais, as quatro operações, as operações trigonométricas (seno, cosseno e tangente) e as operações de exponenciação (quadrado, cubo, raiz quadrada, raiz cúbica e x elevado a y). Usando notação rpn de tal forma que todas as operações sejam representadas por uma S-expression. Como mostrado no exemplo
 -- a seguir:
-
 -- 𝑎) ( 3.4 5.0 +)
 -- 𝑏) ( 3.4 (3.0 2 𝐸𝑋𝑃) +)
-
 -- Caberá a você definir como irá separar os operandos de cada operação. Também caberá a você determinar as palavras chaves que usará para representar as operações trigonométricas (seno, cosseno e tangente) e as operações de exponenciação (quadrado, cubo, raiz quadrada, raiz cúbica e x elevado a y).
-
 -- É importante observar que as S-expressions podem ser aninhadas, como pode ser visto no exemplo b e que não há limites para o aninhamento de expressões. Além disso, é importante lembrar que algumas operações solicitadas são unárias e outras são binárias.
 
+-- | tipo de dado que representa o argumento de uma expressão, pode ser ou uma Expressão, ou um Valor
 data ExpressArg = Expression String | Value Float deriving (Show)
 
 -- | Checa se dado argumento da expressão é igual a dada string
 doExpressEqual :: ExpressArg -> String -> Bool
 doExpressEqual (Expression s) str = s == str
-doExpressEqual (Value v) str = (isNumeric str) && (read str) == v
+doExpressEqual (Value v) str = isNumeric str && read str == v
 
--- | Gerencia qual ação sera realizada pelo acumulator de acordo com o arg da expressão
+-- | Gerencia qual ação sera realizada no acumulator de acordo com o arg da expressão
 expressHandler :: ExpressArg -> [Float] -> [Float]
 expressHandler (Expression s) acc = applier s acc
 expressHandler (Value v) acc = acc ++ [v]
@@ -71,15 +69,3 @@ applier exp acc
   | exp == "/" = init (init acc) ++ [(/) (last2 acc) (last acc)] -- divisao
   | exp == "exp" = init (init acc) ++ [last2 acc ** last acc]    -- elevado ao (potencia)
   | otherwise = error ("interpretError - Invalid Expression ["++exp++"]") -- expressão invalida
-
--- main :: IO ()
--- main = do
---   print (interpret "( 3 6 - )")
---   print (interpret "( 5 ( 3 1 - ) + )")
---   print (interpret "( ( 5 3 + ) cbc )")
---   print (interpret "( 3.4 ( 3.0 2 exp ) + )")
---   print (interpret "( 2 6 exp ) ( 3 9 * ) /")
---   print (interpret "( 69 2 exp ) ( 24 ( 3.14 -0.911 * ) + ) /")
---   print (interpret "( 3.1415926 2 / ) sin")
---   print (interpret " 4 sqrt")
---   print (interpret " 27 cbct")

@@ -1,12 +1,10 @@
-entrypoint = "Main.hs"
-
 hidden = [".ghci", "ghci_wrapper.sh"]
 
 [nix]
 channel = "stable-22_11"
 
 [interpreter]
-command = ["cd src && ./../ghci_wrapper.sh"]
+command = ["./run.sh"]
 
 [languages.haskell]
 pattern = "**/*.hs"
