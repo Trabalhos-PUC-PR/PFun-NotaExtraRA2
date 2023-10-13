@@ -5,4 +5,4 @@ if [[ "$#" == 0 ]]; then
 fi
 
 # This is needed to run the `main` function by default.
-{ echo main ; cat - ; } | exec ghci "$@"
+{ echo :cd src ; echo :load "$@" ; echo :!clear; echo main; cat - ; } | exec ghci 
