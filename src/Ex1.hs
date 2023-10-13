@@ -56,6 +56,7 @@ calculator lista acc
 -- levanta erro caso a expressão seja invalida
 applier :: String -> [Float] -> [Float]
 applier exp acc
+  | null acc = error ("interpretError - No value given to apply on ["++exp++"]") -- qtde de valores passados invalido
   | exp == "sin" = init acc ++ [sin (last acc)]                  -- seno
   | exp == "cos" = init acc ++ [cos (last acc)]                  -- cosseno
   | exp == "tan" = init acc ++ [tan (last acc)]                  -- tangente
@@ -63,6 +64,7 @@ applier exp acc
   | exp == "cbc" = init acc ++ [last acc ** 3]                   -- ao cubo
   | exp == "sqrt" = init acc ++ [last acc**(1/2)]                -- raiz quadrada
   | exp == "cbct" = init acc ++ [last acc**(1/3)]                -- raiz cubica
+  | length acc == 1 = error ("interpretError - Binary expression ["++exp++"] got only one value to operate") -- qtde de valores passados invalido
   | exp == "+" = init (init acc) ++ [(+) (last2 acc) (last acc)] -- soma
   | exp == "-" = init (init acc) ++ [(-) (last2 acc) (last acc)] -- subtracao
   | exp == "*" = init (init acc) ++ [(*) (last2 acc) (last acc)] -- multiplicacao
