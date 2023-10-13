@@ -15,20 +15,15 @@ import Data.Maybe (isJust)
 
 data ExpressArg = Expression String | Value Float deriving (Show)
 
--- Getters e "Checkers"
-isExpress :: ExpressArg -> Bool
-isExpress (Expression s) = True
-isExpress (Value v) = False 
-isValue :: ExpressArg -> Bool
-isValue (Expression s) = False
-isValue (Value v) = True 
+-- | Checa se dado argumento da expressão é igual a dada string
+doExpressEqual :: ExpressArg -> String -> Bool
+doExpressEqual (Expression s) str = s == str
+doExpressEqual (Value v) str = (isNumeric str) && (read str) == v
 
-getExp :: ExpressArg -> String
-getExp (Expression s) = s
-getExp (Value v) = ""
-getVal :: ExpressArg -> Float
-getVal (Expression s) = -0
-getVal (Value v) = v 
+-- | Gerencia qual ação sera realizada pelo acumulator de acordo com o arg da expressão
+expressHandler :: ExpressArg -> [Float] -> [Float]
+expressHandler (Expression s) acc = applier s acc
+expressHandler (Value v) acc = acc ++ [v]
 
 -- | Verifica se a String é valida para ser um numero ou nao
 isNumeric :: String -> Bool
@@ -56,10 +51,8 @@ parseString s
 calculator :: [ExpressArg] -> [Float] -> Float
 calculator lista acc
   | null lista = last acc
-  | getExp(head lista)=="(" || getExp(head lista)==")" = calculator(tail lista) acc
-  | isValue (head lista) = calculator(tail lista) ( acc++[getVal(head lista)] )
-  | isExpress (head lista) = calculator(tail lista) ( applier (getExp(head lista)) acc)
-  | otherwise = error "interpretError - an argument inside the expression is invalid"
+  | doExpressEqual(head lista) "(" || doExpressEqual(head lista) ")" = calculator(tail lista) acc
+  | otherwise = calculator(tail lista) (expressHandler (head lista) acc)
 
 -- | Aplica funcoes de acordo com o valor da expressão recebida, 
 -- levanta erro caso a expressão seja invalida
