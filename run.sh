@@ -1,5 +1,4 @@
-cd src 
+#!/bin/bash
 
-./../ghci_wrapper.sh Main.hs 
-
-cd ..
+# This is needed to run the `main` function and auto quit by default 
+{ echo :setup; echo :q ; } | exec ghci
