@@ -21,7 +21,7 @@ doExpressEqual (Value val) str = isNumeric str && read str == val
 -- | Gerencia qual ação sera realizada no acumulator de acordo com o arg da expressão
 expressHandler :: ExpressArg -> [Float] -> [Float]
 expressHandler (Expression express) acc = applier express acc
-expressHandler (Value val) acc = acc ++ [val]
+expressHandler (Value val) acc = val : acc
 
 -- | Verifica se a String é valida para ser um numero ou nao
 isNumeric :: String -> Bool
@@ -53,17 +53,17 @@ calculator list acc
 -- | Aplica funcoes de acordo com o valor da expressão recebida, levanta erro caso a expressão seja invalida
 applier :: String -> [Float] -> [Float]
 applier express [] = error ("interpretError - No value given to apply on ["++express++"]") -- qtde de valores passados invalido
-applier "sin" acc = acc ++ [sin (last acc)]                  -- seno
-applier "cos" acc = acc ++ [cos (last acc)]           -- cosseno
-applier "tan" acc = acc ++ [tan (last acc)]           -- tangente
-applier "sqr" acc = acc ++ [last acc ** 2]            -- ao quadrado
-applier "cbc" acc = acc ++ [last acc ** 3]            -- ao cubo
-applier "sqrt" acc= acc ++ [last acc**(1/2)]         -- raiz quadrada
-applier "cbct" acc= acc ++ [last acc**(1/3)]         -- raiz cubica
+applier "sin" (x:acc) = sin x : acc                  -- seno
+applier "cos" (x:acc) = cos x : acc           -- cosseno
+applier "tan" (x:acc) = tan x : acc           -- tangente
+applier "sqr" (x:acc) = x ** 2 : acc            -- ao quadrado
+applier "cbc" (x:acc) = x ** 3 : acc            -- ao cubo
+applier "sqrt" (x:acc)= x ** (1/2) : acc         -- raiz quadrada
+applier "cbct" (x:acc)= x ** (1/3) : acc         -- raiz cubica
 applier express [_] = error ("interpretError - Binary expression ["++express++"] got only one value to operate") -- qtde de valores passados invalido
-applier "+" acc = acc ++ [(+) (last2 acc) (last acc)] -- soma
-applier "-" acc = acc ++ [(-) (last2 acc) (last acc)] -- subtracao
-applier "*" acc = acc ++ [(*) (last2 acc) (last acc)] -- multiplicacao
-applier "/" acc = acc ++ [(/) (last2 acc) (last acc)] -- divisao
-applier "exp" acc= acc ++ [last2 acc ** last acc]    -- elevado ao (potencia)
+applier "+" (y:x:acc) = (+) x y : acc -- soma
+applier "-" (y:x:acc) = (-) x y : acc -- subtracao
+applier "*" (y:x:acc) = (*) x y : acc -- multiplicacao
+applier "/" (y:x:acc) = (/) x y : acc -- divisao
+applier "exp" (y:x:acc)= x ** y : acc    -- elevado ao (potencia)
 applier express _ = error ("interpretError - Invalid Expression ["++express++"]") -- expressão invalida
