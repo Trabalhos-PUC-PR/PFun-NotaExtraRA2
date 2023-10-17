@@ -15,13 +15,13 @@ data ExpressArg = Expression String | Value Float deriving (Show)
 
 -- | Checa se dado argumento da expressão é igual a dada string
 doExpressEqual :: ExpressArg -> String -> Bool
-doExpressEqual (Expression s) str = s == str
-doExpressEqual (Value v) str = isNumeric str && read str == v
+doExpressEqual (Expression express) str = express == str
+doExpressEqual (Value val) str = isNumeric str && read str == val
 
 -- | Gerencia qual ação sera realizada no acumulator de acordo com o arg da expressão
 expressHandler :: ExpressArg -> [Float] -> [Float]
-expressHandler (Expression s) acc = applier s acc
-expressHandler (Value v) acc = acc ++ [v]
+expressHandler (Expression express) acc = applier express acc
+expressHandler (Value val) acc = acc ++ [val]
 
 -- | Verifica se a String é valida para ser um numero ou nao
 isNumeric :: String -> Bool
@@ -29,45 +29,42 @@ isNumeric str = isJust(readMaybe str :: Maybe Float)
 
 -- | Pega o penultimo elemento de uma lista
 last2 :: [a] -> a
-last2 s = head (tail (reverse s))
+last2 list = head (tail (reverse list))
 
 -- | Interpreta uma dada expressão e retorna seu resultado como Float
 interpret :: String -> Float
 interpret "" = 0
-interpret s = calculator(parseString (words s)) []
+interpret string = calculator(parseString (words string)) []
 
--- | Recebe uma lista de strings, e da parse nela de jeito que os valores numericos 
--- são um tipo, e expressões são outro, e uma lista com todos os valores "parseados"
+-- | Recebe uma lista de string, e devolve uma lista de argumentos da expressão, que são ou Values ou Expressions
 parseString :: [String] -> [ExpressArg]
-parseString s
-  | length s > 1 && isNumeric (head s) = Value (read (head s)) : parseString (tail s)
-  | length s > 1 && not(isNumeric (head s)) = Expression (head s) : parseString (tail s)
-  | length s == 1 && isNumeric (head s) = [Value (read(head s))]
-  | otherwise = [Expression (head s)]
+parseString [] = []
+parseString list
+  | isNumeric (head list) = Value (read (head list)) : parseString (tail list)
+  | not(isNumeric (head list)) = Expression (head list) : parseString (tail list)
 
 -- | Calcula dada expressão representada pelo tipo criado e devolve um float
 calculator :: [ExpressArg] -> [Float] -> Float
-calculator lista acc
-  | null lista = last acc
-  | doExpressEqual(head lista) "(" || doExpressEqual(head lista) ")" = calculator(tail lista) acc
-  | otherwise = calculator(tail lista) (expressHandler (head lista) acc)
+calculator [] acc = last acc
+calculator list acc
+  | doExpressEqual(head list) "(" || doExpressEqual(head list) ")" = calculator(tail list) acc
+  | otherwise = calculator(tail list) (expressHandler (head list) acc)
 
--- | Aplica funcoes de acordo com o valor da expressão recebida, 
--- levanta erro caso a expressão seja invalida
+-- | Aplica funcoes de acordo com o valor da expressão recebida, levanta erro caso a expressão seja invalida
 applier :: String -> [Float] -> [Float]
-applier exp acc
-  | null acc = error ("interpretError - No value given to apply on ["++exp++"]") -- qtde de valores passados invalido
-  | exp == "sin" = init acc ++ [sin (last acc)]                  -- seno
-  | exp == "cos" = init acc ++ [cos (last acc)]                  -- cosseno
-  | exp == "tan" = init acc ++ [tan (last acc)]                  -- tangente
-  | exp == "sqr" = init acc ++ [last acc ** 2]                   -- ao quadrado
-  | exp == "cbc" = init acc ++ [last acc ** 3]                   -- ao cubo
-  | exp == "sqrt" = init acc ++ [last acc**(1/2)]                -- raiz quadrada
-  | exp == "cbct" = init acc ++ [last acc**(1/3)]                -- raiz cubica
-  | length acc == 1 = error ("interpretError - Binary expression ["++exp++"] got only one value to operate") -- qtde de valores passados invalido
-  | exp == "+" = init (init acc) ++ [(+) (last2 acc) (last acc)] -- soma
-  | exp == "-" = init (init acc) ++ [(-) (last2 acc) (last acc)] -- subtracao
-  | exp == "*" = init (init acc) ++ [(*) (last2 acc) (last acc)] -- multiplicacao
-  | exp == "/" = init (init acc) ++ [(/) (last2 acc) (last acc)] -- divisao
-  | exp == "exp" = init (init acc) ++ [last2 acc ** last acc]    -- elevado ao (potencia)
-  | otherwise = error ("interpretError - Invalid Expression ["++exp++"]") -- expressão invalida
+applier express acc
+  | null acc = error ("interpretError - No value given to apply on ["++express++"]") -- qtde de valores passados invalido
+  | express == "sin" = init acc ++ [sin (last acc)]                  -- seno
+  | express == "cos" = init acc ++ [cos (last acc)]                  -- cosseno
+  | express == "tan" = init acc ++ [tan (last acc)]                  -- tangente
+  | express == "sqr" = init acc ++ [last acc ** 2]                   -- ao quadrado
+  | express == "cbc" = init acc ++ [last acc ** 3]                   -- ao cubo
+  | express == "sqrt" = init acc ++ [last acc**(1/2)]                -- raiz quadrada
+  | express == "cbct" = init acc ++ [last acc**(1/3)]                -- raiz cubica
+  | length acc == 1 = error ("interpretError - Binary expression ["++express++"] got only one value to operate") -- qtde de valores passados invalido
+  | express == "+" = init (init acc) ++ [(+) (last2 acc) (last acc)] -- soma
+  | express == "-" = init (init acc) ++ [(-) (last2 acc) (last acc)] -- subtracao
+  | express == "*" = init (init acc) ++ [(*) (last2 acc) (last acc)] -- multiplicacao
+  | express == "/" = init (init acc) ++ [(/) (last2 acc) (last acc)] -- divisao
+  | express == "exp" = init (init acc) ++ [last2 acc ** last acc]    -- elevado ao (potencia)
+  | otherwise = error ("interpretError - Invalid Expression ["++express++"]") -- expressão invalida
