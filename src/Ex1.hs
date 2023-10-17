@@ -52,19 +52,18 @@ calculator list acc
 
 -- | Aplica funcoes de acordo com o valor da expressão recebida, levanta erro caso a expressão seja invalida
 applier :: String -> [Float] -> [Float]
-applier express acc
-  | null acc = error ("interpretError - No value given to apply on ["++express++"]") -- qtde de valores passados invalido
-  | express == "sin" = init acc ++ [sin (last acc)]                  -- seno
-  | express == "cos" = init acc ++ [cos (last acc)]                  -- cosseno
-  | express == "tan" = init acc ++ [tan (last acc)]                  -- tangente
-  | express == "sqr" = init acc ++ [last acc ** 2]                   -- ao quadrado
-  | express == "cbc" = init acc ++ [last acc ** 3]                   -- ao cubo
-  | express == "sqrt" = init acc ++ [last acc**(1/2)]                -- raiz quadrada
-  | express == "cbct" = init acc ++ [last acc**(1/3)]                -- raiz cubica
-  | length acc == 1 = error ("interpretError - Binary expression ["++express++"] got only one value to operate") -- qtde de valores passados invalido
-  | express == "+" = init (init acc) ++ [(+) (last2 acc) (last acc)] -- soma
-  | express == "-" = init (init acc) ++ [(-) (last2 acc) (last acc)] -- subtracao
-  | express == "*" = init (init acc) ++ [(*) (last2 acc) (last acc)] -- multiplicacao
-  | express == "/" = init (init acc) ++ [(/) (last2 acc) (last acc)] -- divisao
-  | express == "exp" = init (init acc) ++ [last2 acc ** last acc]    -- elevado ao (potencia)
-  | otherwise = error ("interpretError - Invalid Expression ["++express++"]") -- expressão invalida
+applier express [] = error ("interpretError - No value given to apply on ["++express++"]") -- qtde de valores passados invalido
+applier "sin" acc = acc ++ [sin (last acc)]                  -- seno
+applier "cos" acc = acc ++ [cos (last acc)]           -- cosseno
+applier "tan" acc = acc ++ [tan (last acc)]           -- tangente
+applier "sqr" acc = acc ++ [last acc ** 2]            -- ao quadrado
+applier "cbc" acc = acc ++ [last acc ** 3]            -- ao cubo
+applier "sqrt" acc= acc ++ [last acc**(1/2)]         -- raiz quadrada
+applier "cbct" acc= acc ++ [last acc**(1/3)]         -- raiz cubica
+applier express [_] = error ("interpretError - Binary expression ["++express++"] got only one value to operate") -- qtde de valores passados invalido
+applier "+" acc = acc ++ [(+) (last2 acc) (last acc)] -- soma
+applier "-" acc = acc ++ [(-) (last2 acc) (last acc)] -- subtracao
+applier "*" acc = acc ++ [(*) (last2 acc) (last acc)] -- multiplicacao
+applier "/" acc = acc ++ [(/) (last2 acc) (last acc)] -- divisao
+applier "exp" acc= acc ++ [last2 acc ** last acc]    -- elevado ao (potencia)
+applier express _ = error ("interpretError - Invalid Expression ["++express++"]") -- expressão invalida
