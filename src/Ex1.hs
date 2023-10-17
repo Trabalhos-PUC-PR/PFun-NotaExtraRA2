@@ -27,10 +27,6 @@ expressHandler (Value val) acc = val : acc
 isNumeric :: String -> Bool
 isNumeric str = isJust(readMaybe str :: Maybe Float)
 
--- | Pega o penultimo elemento de uma lista
-last2 :: [a] -> a
-last2 list = head (tail (reverse list))
-
 -- | Interpreta uma dada expressão e retorna seu resultado como Float
 interpret :: String -> Float
 interpret "" = 0
