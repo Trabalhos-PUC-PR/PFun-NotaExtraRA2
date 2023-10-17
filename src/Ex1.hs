@@ -41,7 +41,7 @@ parseString :: [String] -> [ExpressArg]
 parseString [] = []
 parseString list
   | isNumeric (head list) = Value (read (head list)) : parseString (tail list)
-  | not(isNumeric (head list)) = Expression (head list) : parseString (tail list)
+  | otherwise = Expression (head list) : parseString (tail list)
 
 -- | Calcula dada expressão representada pelo tipo criado e devolve um float
 calculator :: [ExpressArg] -> [Float] -> Float
